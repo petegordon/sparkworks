@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><base href="/pr-preview/pr-1/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Improv — Columbus Startup Week</title>
+<meta name="description" content="AI improv: Pete and Dan vibe code an app with prompts from the audience. Columbus Startup Week, 4:00 PM at Meridian.">
+<meta property="og:title" content="AI Improv — Columbus Startup Week">
+<meta property="og:description" content="Pete and Dan vibe code an app with prompts from the audience. 4:00 PM at Meridian.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://sparkworks.jimandi.love/">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0b0b14;
+    --bg-card: #14142a;
+    --fg: #f5f5fa;
+    --fg-dim: #a0a0c0;
+    --accent: #ff5cf2;
+    --accent-2: #5cf2ff;
+    --ai: #b388ff;
+    --comedy: #5ce0ff;
+    --border: rgba(255, 255, 255, 0.1);
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 0%, rgba(255, 92, 242, 0.18), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 100%, rgba(92, 242, 255, 0.15), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+  header {
+    margin-bottom: 48px;
+  }
+  .eyebrow {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-size: clamp(36px, 6vw, 56px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 16px;
+  }
+  .tagline {
+    font-size: 18px;
+    color: var(--fg-dim);
+    max-width: 560px;
+  }
+  .session-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 32px;
+  }
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: var(--fg-dim);
+  }
+  .meta-row .time {
+    color: var(--fg);
+    font-weight: 600;
+  }
+  .meta-row .location::before { content: "📍 "; }
+  .session-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--fg);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .speakers {
+    color: var(--fg-dim);
+    font-size: 15px;
+    margin-bottom: 20px;
+  }
+  .duration::before { content: " • "; color: var(--fg-dim); }
+  .tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid;
+  }
+  .tag-ai {
+    color: var(--ai);
+    border-color: var(--ai);
+    background: rgba(179, 136, 255, 0.08);
+  }
+  .tag-comedy {
+    color: var(--comedy);
+    border-color: var(--comedy);
+    background: rgba(92, 224, 255, 0.08);
+  }
+  section.about {
+    margin-top: 32px;
+  }
+  section.about h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--fg);
+  }
+  section.about p {
+    color: var(--fg-dim);
+    margin-bottom: 12px;
+  }
+  .app-slot {
+    margin-top: 32px;
+    padding: 24px;
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    text-align: center;
+    color: var(--fg-dim);
+  }
+  .app-slot strong {
+    color: var(--fg);
+    display: block;
+    margin-bottom: 4px;
+    font-size: 16px;
+  }
+  footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--fg-dim);
+    font-size: 13px;
+    text-align: center;
+  }
+  footer a { color: var(--accent-2); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="eyebrow">Columbus Startup Week</span>
+    <h1>AI Improv</h1>
+    <p class="tagline">Pete and Dan vibe code an app, live, with prompts from the audience.</p>
+  </header>
+
+  <article class="session-card">
+    <div class="meta-row">
+      <span class="time">4:00 PM</span>
+      <span>—</span>
+      <span class="location">Meridian</span>
+    </div>
+    <h2 class="session-title">AI improv: Pete and Dan vibe code an app with prompts from the audience</h2>
+    <p class="speakers">Pete Gordon and Dan Rockwell<span class="duration">45 min</span></p>
+    <div class="tags">
+      <span class="tag tag-ai">AI</span>
+      <span class="tag tag-comedy">Comedy</span>
+    </div>
+  </article>
+
+  <section class="about">
+    <h2>What's this?</h2>
+    <p>It's improv comedy, but the bit is software. The audience throws prompts at us — features, themes, ridiculous constraints — and we build the app live, on stage, in 45 minutes.</p>
+    <p>No script. No safety net. No backup slides if the model rate-limits us.</p>
+  </section>
+
+  <div class="app-slot">
+    <strong>Live app appears here</strong>
+    Whatever we ship on stage will be embedded right at this URL.
+  </div>
+
+  <footer>
+    Part of <a href="https://sparkworksinnovation.com/event/columbus-startup-week-22/page/home-columbus-startup-week" target="_blank" rel="noopener">Columbus Startup Week</a> by Sparkworks
+  </footer>
+</main>
+</body>
+</html>
