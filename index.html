@@ -3,12 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Improv — Columbus Startup Week</title>
-<meta name="description" content="AI improv: Pete and Dan vibe code an app with prompts from the audience. Columbus Startup Week, 4:00 PM at Meridian.">
-<meta property="og:title" content="AI Improv — Columbus Startup Week">
-<meta property="og:description" content="Pete and Dan vibe code an app with prompts from the audience. 4:00 PM at Meridian.">
+<title>AI Improv — 3 Models, 3 Games</title>
+<meta name="description" content="Three AI models. Same prompt. Three ghost-hunting picnic games. Pick your fighter.">
+<meta property="og:title" content="AI Improv — 3 Models, 3 Games">
+<meta property="og:description" content="Three AI models. Same prompt. Three ghost-hunting picnic games. Pick your fighter.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://sparkworks.jimandi.love/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Bungee+Shade&family=Bungee&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
@@ -18,9 +21,16 @@
     --fg-dim: #a0a0c0;
     --accent: #ff5cf2;
     --accent-2: #5cf2ff;
+    --border: rgba(255, 255, 255, 0.1);
+    --spray-pink: #ff2bd6;
+    --spray-cyan: #2bf6ff;
+    --spray-yellow: #fff23b;
+    --spray-green: #39ff5c;
+    --spray-orange: #ff8a1c;
+    --spray-purple: #b388ff;
+    --bg-card: #14142a;
     --ai: #b388ff;
     --comedy: #5ce0ff;
-    --border: rgba(255, 255, 255, 0.1);
   }
   html, body {
     background: var(--bg);
@@ -38,124 +48,230 @@
     background-attachment: fixed;
   }
   main {
-    max-width: 760px;
+    max-width: 880px;
     margin: 0 auto;
     padding: 48px 24px 80px;
   }
-  header {
-    margin-bottom: 48px;
-  }
+  header { margin-bottom: 36px; text-align: center; }
   .eyebrow {
     display: inline-block;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    font-size: 13px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
     color: var(--accent);
     margin-bottom: 12px;
   }
   h1 {
-    font-size: clamp(36px, 6vw, 56px);
-    font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 16px;
+    font-family: 'Bungee Shade', 'Permanent Marker', cursive;
+    font-size: clamp(36px, 7vw, 64px);
+    line-height: 1; letter-spacing: 0.01em;
+    color: var(--spray-yellow);
+    text-shadow:
+      4px 4px 0 var(--spray-pink),
+      8px 8px 0 rgba(0,0,0,0.7),
+      0 0 26px rgba(255, 43, 214, 0.45);
+    transform: rotate(-2deg);
+    display: inline-block;
+    margin-bottom: 18px;
   }
   .tagline {
+    font-family: 'Permanent Marker', cursive;
     font-size: 18px;
-    color: var(--fg-dim);
-    max-width: 560px;
+    color: var(--spray-cyan);
+    text-shadow: 1px 1px 0 #000, 0 0 12px rgba(43,246,255,0.35);
+    transform: rotate(0.5deg);
+    display: inline-block;
+    max-width: 620px;
   }
   .session-card {
+    margin: 24px auto 0;
+    max-width: 620px;
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 16px;
-    padding: 28px;
-    margin-bottom: 32px;
+    padding: 22px 24px;
+    text-align: left;
   }
   .meta-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-    margin-bottom: 16px;
-    font-size: 14px;
-    color: var(--fg-dim);
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    margin-bottom: 12px; font-size: 14px; color: var(--fg-dim);
   }
-  .meta-row .time {
-    color: var(--fg);
-    font-weight: 600;
-  }
+  .meta-row .time { color: var(--fg); font-weight: 600; }
   .meta-row .location::before { content: "📍 "; }
   .session-title {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--fg);
-    margin-bottom: 8px;
-    letter-spacing: -0.01em;
+    font-size: 20px; font-weight: 700; color: var(--fg);
+    margin-bottom: 6px; letter-spacing: -0.01em;
   }
-  .speakers {
-    color: var(--fg-dim);
-    font-size: 15px;
-    margin-bottom: 20px;
-  }
+  .speakers { color: var(--fg-dim); font-size: 14px; margin-bottom: 16px; }
   .duration::before { content: " • "; color: var(--fg-dim); }
-  .tags {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; }
   .tag {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 600;
-    border: 1px solid;
+    display: inline-block; padding: 4px 12px; border-radius: 999px;
+    font-size: 12px; font-weight: 600; border: 1px solid;
   }
-  .tag-ai {
-    color: var(--ai);
-    border-color: var(--ai);
-    background: rgba(179, 136, 255, 0.08);
-  }
-  .tag-comedy {
-    color: var(--comedy);
-    border-color: var(--comedy);
-    background: rgba(92, 224, 255, 0.08);
-  }
+  .tag-ai { color: var(--ai); border-color: var(--ai); background: rgba(179,136,255,0.08); }
+  .tag-comedy { color: var(--comedy); border-color: var(--comedy); background: rgba(92,224,255,0.08); }
+
   section.about {
-    margin-top: 32px;
+    margin: 24px auto 0;
+    max-width: 620px;
+    text-align: left;
   }
   section.about h2 {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 12px;
-    color: var(--fg);
+    font-family: 'Permanent Marker', cursive;
+    font-size: 22px;
+    color: var(--spray-yellow);
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 0 #000;
+    transform: rotate(-1deg);
+    display: inline-block;
   }
   section.about p {
     color: var(--fg-dim);
-    margin-bottom: 12px;
+    margin-bottom: 10px;
+    font-size: 15px;
   }
-  .app-slot {
-    margin-top: 32px;
-    padding: 24px;
-    border: 2px dashed var(--border);
-    border-radius: 16px;
-    text-align: center;
+
+  .prompt-callout {
+    margin: 28px auto 8px;
+    max-width: 620px;
+    padding: 14px 18px;
+    border: 2px dashed rgba(255,255,255,0.15);
+    border-radius: 12px;
+    background: rgba(0,0,0,0.3);
+    font-size: 14px;
     color: var(--fg-dim);
+    text-align: left;
   }
-  .app-slot strong {
+  .prompt-callout strong {
+    color: var(--spray-green);
+    font-family: 'Permanent Marker', cursive;
+    letter-spacing: 0.04em;
+  }
+  .prompt-callout em {
     color: var(--fg);
-    display: block;
-    margin-bottom: 4px;
-    font-size: 16px;
+    font-style: normal;
+    background: rgba(255,242,59,0.08);
+    padding: 1px 4px;
+    border-radius: 3px;
   }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 22px;
+    margin-top: 32px;
+  }
+  .card {
+    position: relative;
+    border-radius: 18px;
+    border: 3px solid #000;
+    padding: 24px 22px 22px;
+    background:
+      repeating-linear-gradient(115deg, rgba(255,255,255,0.04) 0 2px, transparent 2px 14px),
+      var(--bg-card);
+    box-shadow: 6px 6px 0 #000, 0 0 30px rgba(0,0,0,0.4);
+    text-decoration: none;
+    color: var(--fg);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    overflow: hidden;
+  }
+  .card:nth-child(1) { transform: rotate(-1.5deg); }
+  .card:nth-child(2) { transform: rotate(0.8deg); }
+  .card:nth-child(3) { transform: rotate(-0.6deg); }
+  .card:hover {
+    transform: rotate(0deg) translate(-2px, -3px);
+    box-shadow: 9px 9px 0 #000, 0 0 40px rgba(255, 43, 214, 0.25);
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    pointer-events: none;
+    opacity: 0.18;
+    background: var(--card-glow);
+  }
+  .card.claude { --card-glow: radial-gradient(circle at 80% 0%, var(--spray-pink), transparent 60%); }
+  .card.codex  { --card-glow: radial-gradient(circle at 0% 100%, var(--spray-cyan), transparent 60%); }
+  .card.gemini { --card-glow: radial-gradient(circle at 100% 100%, var(--spray-purple), transparent 60%); }
+
+  .card .badge {
+    align-self: flex-start;
+    font-family: 'Bungee', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 2px solid currentColor;
+    margin-bottom: 14px;
+    transform: rotate(-2deg);
+  }
+  .card.claude .badge { color: var(--spray-pink); }
+  .card.codex  .badge { color: var(--spray-cyan); }
+  .card.gemini .badge { color: var(--spray-purple); }
+
+  .card h2 {
+    font-family: 'Bungee Shade', cursive;
+    font-size: 32px;
+    line-height: 1;
+    margin-bottom: 8px;
+    text-shadow: 3px 3px 0 #000;
+    transform: rotate(-1deg);
+  }
+  .card.claude h2 { color: var(--spray-yellow); }
+  .card.codex  h2 { color: var(--spray-green); }
+  .card.gemini h2 { color: var(--spray-cyan); }
+
+  .card .file {
+    font-family: 'Permanent Marker', cursive;
+    font-size: 13px;
+    color: var(--fg-dim);
+    margin-bottom: 12px;
+    word-break: break-all;
+  }
+  .card p {
+    color: var(--fg-dim);
+    font-size: 14px;
+    margin-bottom: 18px;
+    flex-grow: 1;
+  }
+  .card .play {
+    font-family: 'Bungee', sans-serif;
+    align-self: flex-start;
+    background: var(--spray-yellow);
+    color: #0b0b14;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: 3px solid #000;
+    box-shadow: 3px 3px 0 #000;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .card.codex  .play { background: var(--spray-cyan); }
+  .card.gemini .play { background: var(--spray-purple); color: #0b0b14; }
+  .card:hover .play {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 #000;
+  }
+
+  .splat-deco {
+    position: absolute;
+    font-family: 'Bungee Shade', cursive;
+    font-size: 22px;
+    pointer-events: none;
+    opacity: 0.15;
+    top: 14px;
+    right: 12px;
+    transform: rotate(15deg);
+  }
+
   footer {
-    margin-top: 64px;
+    margin-top: 56px;
     padding-top: 24px;
     border-top: 1px solid var(--border);
     color: var(--fg-dim);
@@ -164,43 +280,82 @@
   }
   footer a { color: var(--accent-2); text-decoration: none; }
   footer a:hover { text-decoration: underline; }
+
+  .drip {
+    display: inline-block;
+    width: 4px; height: 14px;
+    background: var(--spray-pink);
+    border-radius: 0 0 4px 4px;
+    margin: 0 4px;
+    vertical-align: middle;
+    box-shadow: 12px 4px 0 -1px var(--spray-cyan), -14px 6px 0 -1px var(--spray-yellow);
+  }
 </style>
 </head>
 <body>
 <main>
   <header>
-    <span class="eyebrow">Columbus Startup Week</span>
-    <h1>AI Improv</h1>
-    <p class="tagline">Pete and Dan vibe code an app, live, with prompts from the audience.</p>
+    <span class="eyebrow">Columbus Startup Week — AI Improv</span>
+    <h1>3 MODELS<br>3 GAMES</h1>
+    <div class="tagline">// same wild prompt → three different ghost-hunter picnic games <span class="drip"></span> //</div>
+
+    <article class="session-card">
+      <div class="meta-row">
+        <span class="time">4:00 PM</span>
+        <span>—</span>
+        <span class="location">Meridian</span>
+      </div>
+      <h2 class="session-title">AI improv: Pete and Dan vibe code an app with prompts from the audience</h2>
+      <p class="speakers">Pete Gordon and Dan Rockwell<span class="duration">45 min</span></p>
+      <div class="tags">
+        <span class="tag tag-ai">AI</span>
+        <span class="tag tag-comedy">Comedy</span>
+      </div>
+    </article>
+
+    <section class="about">
+      <h2>What's this?</h2>
+      <p>It's improv comedy, but the bit is software. The audience throws prompts at us — features, themes, ridiculous constraints — and we build the app live, on stage, in 45 minutes.</p>
+      <p>No script. No safety net. No backup slides if the model rate-limits us.</p>
+    </section>
+
+    <div class="prompt-callout">
+      <strong>The prompt:</strong> <em>"Build a Ghost Hunter app with National Parks picnic planning for picky eaters, add the Three Body Problem, graffiti style."</em>
+      <br><br>Three frontier models took the same nonsense and shipped. Pick a fighter.
+    </div>
   </header>
 
-  <article class="session-card">
-    <div class="meta-row">
-      <span class="time">4:00 PM</span>
-      <span>—</span>
-      <span class="location">Meridian</span>
-    </div>
-    <h2 class="session-title">AI improv: Pete and Dan vibe code an app with prompts from the audience</h2>
-    <p class="speakers">Pete Gordon and Dan Rockwell<span class="duration">45 min</span></p>
-    <div class="tags">
-      <span class="tag tag-ai">AI</span>
-      <span class="tag tag-comedy">Comedy</span>
-    </div>
-  </article>
+  <div class="grid">
+    <a class="card claude" href="claude.html">
+      <span class="splat-deco">★ ★ ★</span>
+      <span class="badge">Anthropic</span>
+      <h2>CLAUDE</h2>
+      <div class="file">claude.html</div>
+      <p>Trisolaris Park: tag-style HUD, picky crew with gripes, suns flip stable↔chaotic. 90-second round.</p>
+      <span class="play">Play →</span>
+    </a>
 
-  <section class="about">
-    <h2>What's this?</h2>
-    <p>It's improv comedy, but the bit is software. The audience throws prompts at us — features, themes, ridiculous constraints — and we build the app live, on stage, in 45 minutes.</p>
-    <p>No script. No safety net. No backup slides if the model rate-limits us.</p>
-  </section>
+    <a class="card codex" href="ghost-hunter-picnic.html">
+      <span class="splat-deco">✦ ✦ ✦</span>
+      <span class="badge">OpenAI</span>
+      <h2>CODEX</h2>
+      <div class="file">ghost-hunter-picnic.html</div>
+      <p>Codex's take on the same brief. Different mechanics, different vibe — same picky picnic chaos.</p>
+      <span class="play">Play →</span>
+    </a>
 
-  <div class="app-slot">
-    <strong>Live app appears here</strong>
-    Whatever we ship on stage will be embedded right at this URL.
+    <a class="card gemini" href="game.html">
+      <span class="splat-deco">✺ ✺ ✺</span>
+      <span class="badge">Google</span>
+      <h2>GEMINI</h2>
+      <div class="file">game.html</div>
+      <p>Gemini's interpretation. Compare the choices: art style, food logic, how it handled the three-sun twist.</p>
+      <span class="play">Play →</span>
+    </a>
   </div>
 
   <footer>
-    Part of <a href="https://sparkworksinnovation.com/event/columbus-startup-week-22/page/home-columbus-startup-week" target="_blank" rel="noopener">Columbus Startup Week</a> by Sparkworks
+    Part of <a href="https://sparkworksinnovation.com/event/columbus-startup-week-22/page/home-columbus-startup-week" target="_blank" rel="noopener">Columbus Startup Week</a> by Sparkworks · 4:00 PM at Meridian
   </footer>
 </main>
 </body>

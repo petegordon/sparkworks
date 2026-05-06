@@ -1,0 +1,987 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ghost Hunter Picnic Orbit</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #111114;
+      --wall: #252525;
+      --paint-pink: #ff2f8f;
+      --paint-lime: #b9ff22;
+      --paint-cyan: #18d8ff;
+      --paint-yellow: #ffd319;
+      --paint-violet: #8a47ff;
+      --paper: #fff3ce;
+      --shadow: rgba(0, 0, 0, .42);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+      background:
+        radial-gradient(circle at 14% 18%, rgba(255, 47, 143, .24), transparent 22rem),
+        radial-gradient(circle at 86% 12%, rgba(24, 216, 255, .2), transparent 20rem),
+        linear-gradient(130deg, #151516 0%, #262626 42%, #17191b 100%);
+      color: #f8f4e8;
+      font-family: "Arial Black", Impact, system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0 / 58px 58px,
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px) 0 0 / 58px 58px,
+        repeating-linear-gradient(22deg, rgba(255,255,255,.03) 0 1px, transparent 1px 14px);
+      content: "";
+      opacity: .75;
+    }
+
+    .game-shell {
+      width: min(1180px, calc(100vw - 28px));
+      margin: 0 auto;
+      padding: 18px 0 24px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: end;
+      min-height: 124px;
+      padding: 14px 0 10px;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--paint-yellow);
+      font-size: clamp(2.25rem, 8vw, 5.7rem);
+      line-height: .86;
+      letter-spacing: 0;
+      text-shadow:
+        4px 4px 0 #000,
+        8px 8px 0 var(--paint-pink),
+        -4px -3px 0 var(--paint-cyan);
+      transform: rotate(-1.5deg);
+      max-width: 860px;
+    }
+
+    .tagline {
+      margin: 8px 0 0;
+      color: #f8f4e8;
+      font: 700 clamp(.82rem, 2vw, 1rem) system-ui, sans-serif;
+      max-width: 780px;
+      text-transform: uppercase;
+    }
+
+    .scoreboard {
+      display: grid;
+      grid-template-columns: repeat(2, 92px);
+      gap: 8px;
+      font-family: system-ui, sans-serif;
+    }
+
+    .meter {
+      min-height: 68px;
+      border: 3px solid #050505;
+      background: var(--paper);
+      color: #151515;
+      box-shadow: 5px 5px 0 var(--shadow);
+      padding: 8px;
+      transform: rotate(1deg);
+    }
+
+    .meter:nth-child(even) {
+      transform: rotate(-1deg);
+    }
+
+    .meter b {
+      display: block;
+      color: #151515;
+      font-size: .7rem;
+      text-transform: uppercase;
+    }
+
+    .meter span {
+      display: block;
+      margin-top: 2px;
+      font: 900 1.5rem/1 "Arial Black", Impact, sans-serif;
+    }
+
+    .stage-wrap {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 310px;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .stage {
+      position: relative;
+      min-height: 640px;
+      border: 5px solid #090909;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.08), transparent 18%),
+        radial-gradient(circle at 35% 28%, rgba(255, 211, 25, .25), transparent 13%),
+        #1d2422;
+      box-shadow: 9px 10px 0 rgba(0,0,0,.52);
+      overflow: hidden;
+    }
+
+    .skyline {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to top, #111 0 18%, transparent 18%),
+        linear-gradient(160deg, transparent 0 58%, rgba(185,255,34,.28) 58.2% 59%, transparent 59.2%),
+        linear-gradient(22deg, transparent 0 35%, rgba(255,47,143,.23) 35.2% 36%, transparent 36.2%);
+      pointer-events: none;
+    }
+
+    .planet {
+      position: absolute;
+      width: var(--size);
+      height: var(--size);
+      left: calc(var(--x) - var(--size) / 2);
+      top: calc(var(--y) - var(--size) / 2);
+      border: 4px solid #090909;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 36% 28%, rgba(255,255,255,.6), transparent 16%),
+        var(--color);
+      box-shadow: 0 0 28px var(--glow), 5px 5px 0 rgba(0,0,0,.45);
+    }
+
+    .planet::after {
+      position: absolute;
+      inset: 26% -24%;
+      border: 3px solid rgba(0,0,0,.65);
+      border-radius: 50%;
+      transform: rotate(-12deg);
+      content: "";
+    }
+
+    .orbit {
+      position: absolute;
+      border: 2px dashed rgba(255,255,255,.18);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .park {
+      position: absolute;
+      width: 192px;
+      min-height: 132px;
+      border: 4px solid #050505;
+      background: linear-gradient(135deg, #335c3f, #1f3a2a);
+      box-shadow: 7px 7px 0 rgba(0,0,0,.48);
+      padding: 8px;
+      cursor: pointer;
+      transform: rotate(var(--tilt));
+      transition: transform .15s ease, filter .15s ease;
+      user-select: none;
+    }
+
+    .park:hover,
+    .park:focus-visible {
+      filter: saturate(1.25) brightness(1.08);
+      outline: none;
+      transform: rotate(var(--tilt)) translateY(-4px);
+    }
+
+    .park.selected {
+      box-shadow: 0 0 0 5px var(--paint-yellow), 8px 8px 0 rgba(0,0,0,.5);
+    }
+
+    .park.cursed {
+      animation: shake .45s linear infinite;
+    }
+
+    .park h2 {
+      margin: 0 0 6px;
+      color: var(--paint-lime);
+      font-size: 1.03rem;
+      line-height: 1;
+      text-shadow: 2px 2px 0 #000;
+    }
+
+    .park p {
+      margin: 0;
+      color: #fff;
+      font: 700 .72rem/1.3 system-ui, sans-serif;
+      text-transform: uppercase;
+    }
+
+    .trees {
+      height: 36px;
+      margin: 7px 0;
+      background:
+        conic-gradient(from 45deg at 50% 55%, transparent 0 25%, #0c1f16 0 50%, transparent 0) 5px 0 / 34px 28px repeat-x,
+        linear-gradient(#734122, #734122) 0 22px / 100% 8px no-repeat;
+    }
+
+    .hunter {
+      position: absolute;
+      width: 64px;
+      height: 86px;
+      left: var(--hunter-x);
+      top: var(--hunter-y);
+      z-index: 8;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(5px 8px 0 rgba(0,0,0,.42));
+      transition: left .12s linear, top .12s linear;
+    }
+
+    .hunter::before {
+      position: absolute;
+      inset: 0;
+      border: 4px solid #090909;
+      border-radius: 28px 28px 12px 12px;
+      background:
+        radial-gradient(circle at 38% 34%, #090909 0 5px, transparent 5px),
+        radial-gradient(circle at 63% 34%, #090909 0 5px, transparent 5px),
+        linear-gradient(130deg, #fff9d7, #59e7ff 62%, #ff2f8f);
+      content: "";
+    }
+
+    .hunter::after {
+      position: absolute;
+      width: 54px;
+      height: 18px;
+      left: 5px;
+      top: -10px;
+      border: 4px solid #090909;
+      border-radius: 50%;
+      background: var(--paint-yellow);
+      content: "";
+    }
+
+    .ghost {
+      position: absolute;
+      width: 58px;
+      height: 66px;
+      left: var(--x);
+      top: var(--y);
+      z-index: 5;
+      border: 3px solid #080808;
+      border-radius: 30px 30px 12px 12px;
+      background:
+        radial-gradient(circle at 34% 34%, #080808 0 4px, transparent 5px),
+        radial-gradient(circle at 64% 34%, #080808 0 4px, transparent 5px),
+        linear-gradient(150deg, rgba(255,255,255,.96), var(--paint-cyan));
+      box-shadow: 0 0 18px rgba(24,216,255,.7), 4px 4px 0 rgba(0,0,0,.36);
+      transform: translate(-50%, -50%) rotate(var(--tilt));
+      animation: floaty 1.6s ease-in-out infinite;
+    }
+
+    .ghost.caught {
+      pointer-events: none;
+      animation: poof .32s ease forwards;
+    }
+
+    .picnic {
+      position: absolute;
+      width: 58px;
+      height: 48px;
+      left: var(--x);
+      top: var(--y);
+      z-index: 4;
+      border: 3px solid #080808;
+      background:
+        linear-gradient(45deg, rgba(255,255,255,.6) 25%, transparent 25% 50%, rgba(255,255,255,.6) 50% 75%, transparent 75%) 0 0 / 18px 18px,
+        var(--paint-pink);
+      box-shadow: 4px 4px 0 rgba(0,0,0,.4);
+      transform: translate(-50%, -50%) rotate(var(--tilt));
+    }
+
+    .spray {
+      position: absolute;
+      width: 40px;
+      height: 56px;
+      left: var(--x);
+      top: var(--y);
+      z-index: 6;
+      border: 3px solid #080808;
+      border-radius: 6px 6px 12px 12px;
+      background: linear-gradient(var(--paint-yellow) 0 22%, #eee 22% 32%, var(--paint-cyan) 32%);
+      box-shadow: 4px 4px 0 rgba(0,0,0,.4);
+      transform: translate(-50%, -50%) rotate(var(--tilt));
+    }
+
+    .spray::before {
+      position: absolute;
+      width: 18px;
+      height: 8px;
+      left: 8px;
+      top: -10px;
+      border: 3px solid #080808;
+      background: #dedede;
+      content: "";
+    }
+
+    aside {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .panel {
+      border: 4px solid #050505;
+      background: #f8f1d6;
+      color: #161616;
+      box-shadow: 7px 7px 0 rgba(0,0,0,.45);
+      padding: 12px;
+      font-family: system-ui, sans-serif;
+    }
+
+    .panel h2 {
+      margin: 0 0 8px;
+      font: 900 1.15rem/1 "Arial Black", Impact, sans-serif;
+      text-transform: uppercase;
+    }
+
+    .brief {
+      margin: 0;
+      font: 750 .86rem/1.36 system-ui, sans-serif;
+    }
+
+    .eater-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .eater {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 8px;
+      align-items: center;
+      min-height: 42px;
+      border: 2px solid #111;
+      background: #fffdf3;
+      padding: 6px;
+      font-weight: 750;
+    }
+
+    .face {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border: 2px solid #111;
+      border-radius: 50%;
+      background: var(--paint-yellow);
+      font-size: .78rem;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    button {
+      min-height: 44px;
+      border: 3px solid #060606;
+      background: var(--paint-lime);
+      color: #111;
+      box-shadow: 4px 4px 0 rgba(0,0,0,.38);
+      cursor: pointer;
+      font: 900 .84rem/1.1 system-ui, sans-serif;
+      text-transform: uppercase;
+    }
+
+    button:hover,
+    button:focus-visible {
+      filter: brightness(1.08);
+      outline: 3px solid var(--paint-cyan);
+      outline-offset: 2px;
+    }
+
+    button.secondary {
+      background: var(--paint-cyan);
+    }
+
+    button.hot {
+      background: var(--paint-pink);
+      color: #fff;
+      text-shadow: 1px 1px 0 #000;
+    }
+
+    .inventory {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 40px;
+    }
+
+    .chip {
+      border: 2px solid #111;
+      background: #fff;
+      color: #111;
+      padding: 5px 7px;
+      font: 850 .75rem/1 system-ui, sans-serif;
+      text-transform: uppercase;
+    }
+
+    .log {
+      min-height: 96px;
+      max-height: 128px;
+      overflow: auto;
+      border: 2px solid #111;
+      background: #151515;
+      color: #fff9dd;
+      padding: 8px;
+      font: 700 .78rem/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .win {
+      position: absolute;
+      inset: 24px;
+      z-index: 20;
+      display: none;
+      place-items: center;
+      border: 5px solid #050505;
+      background:
+        repeating-linear-gradient(-12deg, rgba(255,255,255,.14) 0 10px, transparent 10px 22px),
+        rgba(14,14,16,.94);
+      text-align: center;
+      padding: 22px;
+    }
+
+    .win.show {
+      display: grid;
+    }
+
+    .win h2 {
+      margin: 0 0 14px;
+      color: var(--paint-yellow);
+      font-size: clamp(2.2rem, 8vw, 5.5rem);
+      line-height: .85;
+      text-shadow: 4px 4px 0 #000, 7px 7px 0 var(--paint-pink);
+    }
+
+    .win p {
+      margin: 0 auto 18px;
+      max-width: 620px;
+      font: 800 1rem/1.4 system-ui, sans-serif;
+    }
+
+    .help {
+      display: grid;
+      gap: 6px;
+      margin-top: 10px;
+      color: #f8f4e8;
+      font: 750 .82rem/1.35 system-ui, sans-serif;
+    }
+
+    kbd {
+      display: inline-block;
+      min-width: 24px;
+      border: 2px solid #060606;
+      background: #f8f1d6;
+      color: #111;
+      padding: 1px 5px;
+      text-align: center;
+      box-shadow: 2px 2px 0 #000;
+      font-weight: 900;
+    }
+
+    @keyframes floaty {
+      0%, 100% { margin-top: -4px; }
+      50% { margin-top: 6px; }
+    }
+
+    @keyframes poof {
+      to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.8) rotate(25deg);
+      }
+    }
+
+    @keyframes shake {
+      0%, 100% { margin-left: 0; }
+      25% { margin-left: -3px; }
+      75% { margin-left: 3px; }
+    }
+
+    @media (max-width: 980px) {
+      header,
+      .stage-wrap {
+        grid-template-columns: 1fr;
+      }
+
+      .scoreboard {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .stage {
+        min-height: 580px;
+      }
+
+      aside {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        display: grid;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .game-shell {
+        width: min(100vw - 18px, 1180px);
+        padding-top: 10px;
+      }
+
+      .scoreboard,
+      aside {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .stage {
+        min-height: 520px;
+      }
+
+      .park {
+        width: 148px;
+        min-height: 108px;
+      }
+
+      .park h2 {
+        font-size: .86rem;
+      }
+
+      .park p {
+        font-size: .63rem;
+      }
+
+      .panel {
+        padding: 9px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="game-shell">
+    <header>
+      <div>
+        <h1>Ghost Hunter Picnic Orbit</h1>
+        <p class="tagline">Trap park ghosts, plan picky-eater lunches, and keep the three suns from pulling the ranger map apart.</p>
+      </div>
+      <section class="scoreboard" aria-label="Game scores">
+        <div class="meter"><b>Ghosts</b><span id="ghostScore">0/6</span></div>
+        <div class="meter"><b>Picnics</b><span id="picnicScore">0/4</span></div>
+        <div class="meter"><b>Spray</b><span id="sprayScore">0/3</span></div>
+        <div class="meter"><b>Orbit</b><span id="orbitScore">Stable</span></div>
+      </section>
+    </header>
+
+    <section class="stage-wrap">
+      <section class="stage" id="stage" aria-label="Ghost Hunter Picnic Orbit game board" tabindex="0">
+        <div class="skyline"></div>
+        <div class="orbit" id="orbitA"></div>
+        <div class="orbit" id="orbitB"></div>
+        <div class="orbit" id="orbitC"></div>
+        <div class="planet" id="sunA" style="--size: 92px; --color: #ffd319; --glow: rgba(255,211,25,.75);"></div>
+        <div class="planet" id="sunB" style="--size: 72px; --color: #18d8ff; --glow: rgba(24,216,255,.72);"></div>
+        <div class="planet" id="sunC" style="--size: 62px; --color: #ff2f8f; --glow: rgba(255,47,143,.68);"></div>
+
+        <button class="park selected" data-park="arches" style="left: 5%; top: 12%; --tilt: -2deg;">
+          <h2>Arches</h2>
+          <div class="trees"></div>
+          <p>Needs crunchy, dairy-free, no red sauce.</p>
+        </button>
+        <button class="park" data-park="acadia" style="right: 6%; top: 14%; --tilt: 2deg;">
+          <h2>Acadia</h2>
+          <div class="trees"></div>
+          <p>Sea breeze picnic, no nuts, not spicy.</p>
+        </button>
+        <button class="park" data-park="yosemite" style="left: 10%; bottom: 16%; --tilt: 1.5deg;">
+          <h2>Yosemite</h2>
+          <div class="trees"></div>
+          <p>Big view table, vegetarian, fruit only.</p>
+        </button>
+        <button class="park" data-park="everglades" style="right: 8%; bottom: 13%; --tilt: -1.5deg;">
+          <h2>Everglades</h2>
+          <div class="trees"></div>
+          <p>Cooler lunch, no gluten, no onion.</p>
+        </button>
+
+        <div class="hunter" id="hunter"></div>
+        <div class="win" id="winScreen">
+          <div>
+            <h2>Lunch Saved</h2>
+            <p>The ghosts are tagged, the picky eaters are fed, and the three-body sky is stable enough for one excellent national park picnic route.</p>
+            <button class="hot" id="playAgain">Run It Back</button>
+          </div>
+        </div>
+      </section>
+
+      <aside>
+        <section class="panel">
+          <h2>Ranger Wall</h2>
+          <p class="brief" id="missionText">Select a park, grab the right picnic crate, then catch the ghost haunting that lunch plan.</p>
+          <div class="help">
+            <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrows move</span>
+            <span><kbd>Space</kbd> tags nearby ghosts and supplies</span>
+            <span>Click parks to switch picnic routes</span>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Picky Crew</h2>
+          <ul class="eater-list" id="eaterList"></ul>
+        </section>
+
+        <section class="panel">
+          <h2>Picnic Loadout</h2>
+          <div class="choices" id="mealChoices"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Backpack</h2>
+          <div class="inventory" id="inventory"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Street Log</h2>
+          <div class="log" id="log" aria-live="polite"></div>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const stage = document.querySelector("#stage");
+    const hunter = document.querySelector("#hunter");
+    const ghostScore = document.querySelector("#ghostScore");
+    const picnicScore = document.querySelector("#picnicScore");
+    const sprayScore = document.querySelector("#sprayScore");
+    const orbitScore = document.querySelector("#orbitScore");
+    const missionText = document.querySelector("#missionText");
+    const eaterList = document.querySelector("#eaterList");
+    const mealChoices = document.querySelector("#mealChoices");
+    const inventory = document.querySelector("#inventory");
+    const log = document.querySelector("#log");
+    const winScreen = document.querySelector("#winScreen");
+    const playAgain = document.querySelector("#playAgain");
+    const parkButtons = [...document.querySelectorAll(".park")];
+
+    const parks = {
+      arches: {
+        label: "Arches",
+        meals: ["Chickpea crunch wraps", "Apple chips", "Mint cucumber water"],
+        eaters: ["Maya: crunchy only", "Theo: dairy-free", "June: no red sauce"],
+        needed: "Chickpea crunch wraps",
+        ghost: "The Ketchup Wraith"
+      },
+      acadia: {
+        label: "Acadia",
+        meals: ["Sunbutter oat boats", "Blueberry rice cups", "Mild noodle jars"],
+        eaters: ["Sol: no nuts", "Paz: not spicy", "Ari: smooth textures"],
+        needed: "Blueberry rice cups",
+        ghost: "The Peanut Poltergeist"
+      },
+      yosemite: {
+        label: "Yosemite",
+        meals: ["Veggie summit skewers", "Peach trail cups", "Cheddar boulder bites"],
+        eaters: ["Nina: vegetarian", "Bo: fruit only", "Kai: no smoky flavor"],
+        needed: "Peach trail cups",
+        ghost: "The Jerky Phantom"
+      },
+      everglades: {
+        label: "Everglades",
+        meals: ["Rice paper rollups", "Cold mango noodles", "Corn crunch salad"],
+        eaters: ["Iris: gluten-free", "Mo: no onion", "Ren: cold lunch"],
+        needed: "Rice paper rollups",
+        ghost: "The Onion Shade"
+      }
+    };
+
+    const state = {
+      selectedPark: "arches",
+      x: 52,
+      y: 52,
+      ghosts: 0,
+      picnics: new Set(),
+      sprays: 0,
+      keys: new Set(),
+      items: [],
+      done: false,
+      width: 900,
+      height: 640,
+      suns: [
+        { id: "sunA", orbit: "orbitA", cx: .5, cy: .5, rx: .31, ry: .18, speed: .00052, phase: 0 },
+        { id: "sunB", orbit: "orbitB", cx: .5, cy: .5, rx: .22, ry: .31, speed: -.00072, phase: 1.8 },
+        { id: "sunC", orbit: "orbitC", cx: .5, cy: .5, rx: .38, ry: .28, speed: .00044, phase: 3.3 }
+      ]
+    };
+
+    const spawnPoints = [
+      { type: "ghost", x: 48, y: 188, tilt: "-5deg" },
+      { type: "ghost", x: 364, y: 118, tilt: "4deg" },
+      { type: "ghost", x: 672, y: 260, tilt: "-7deg" },
+      { type: "ghost", x: 176, y: 420, tilt: "8deg" },
+      { type: "ghost", x: 512, y: 492, tilt: "-2deg" },
+      { type: "ghost", x: 754, y: 470, tilt: "6deg" },
+      { type: "picnic", x: 258, y: 218, tilt: "5deg", park: "arches" },
+      { type: "picnic", x: 612, y: 154, tilt: "-4deg", park: "acadia" },
+      { type: "picnic", x: 334, y: 514, tilt: "3deg", park: "yosemite" },
+      { type: "picnic", x: 690, y: 398, tilt: "-6deg", park: "everglades" },
+      { type: "spray", x: 456, y: 294, tilt: "-8deg" },
+      { type: "spray", x: 132, y: 304, tilt: "7deg" },
+      { type: "spray", x: 802, y: 112, tilt: "2deg" }
+    ];
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function addLog(message) {
+      const line = document.createElement("div");
+      line.textContent = `> ${message}`;
+      log.prepend(line);
+    }
+
+    function renderPark() {
+      const park = parks[state.selectedPark];
+      parkButtons.forEach(button => {
+        button.classList.toggle("selected", button.dataset.park === state.selectedPark);
+        button.classList.toggle("cursed", !state.picnics.has(button.dataset.park));
+      });
+      missionText.textContent = `${park.label} is haunted by ${park.ghost}. Feed the crew with ${park.needed}, then tag the ghost.`;
+      eaterList.innerHTML = "";
+      park.eaters.forEach((eater, index) => {
+        const li = document.createElement("li");
+        li.className = "eater";
+        li.innerHTML = `<span class="face">${index + 1}</span><span>${eater}</span>`;
+        eaterList.append(li);
+      });
+      mealChoices.innerHTML = "";
+      park.meals.forEach(meal => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = meal;
+        button.className = meal === park.needed ? "secondary" : "";
+        button.addEventListener("click", () => chooseMeal(meal));
+        mealChoices.append(button);
+      });
+    }
+
+    function chooseMeal(meal) {
+      const park = parks[state.selectedPark];
+      if (meal === park.needed) {
+        if (!state.picnics.has(state.selectedPark)) {
+          state.picnics.add(state.selectedPark);
+          state.items.push(`${park.label} lunch`);
+          addLog(`${meal} clears ${park.label}. The picky crew signs the tablecloth.`);
+        } else {
+          addLog(`${park.label} already has the right picnic packed.`);
+        }
+      } else {
+        addLog(`${meal} gets vetoed at ${park.label}. The ghost laughs in bubble letters.`);
+      }
+      updateHud();
+      renderPark();
+      checkWin();
+    }
+
+    function updateHud() {
+      ghostScore.textContent = `${state.ghosts}/6`;
+      picnicScore.textContent = `${state.picnics.size}/4`;
+      sprayScore.textContent = `${state.sprays}/3`;
+      inventory.innerHTML = "";
+      const list = [...state.items];
+      if (!list.length) list.push("empty pack");
+      list.forEach(item => {
+        const chip = document.createElement("span");
+        chip.className = "chip";
+        chip.textContent = item;
+        inventory.append(chip);
+      });
+    }
+
+    function resize() {
+      const rect = stage.getBoundingClientRect();
+      state.width = rect.width;
+      state.height = rect.height;
+      state.x = clamp(state.x, 32, state.width - 32);
+      state.y = clamp(state.y, 42, state.height - 42);
+      placeHunter();
+      placeWorldItems();
+    }
+
+    function placeHunter() {
+      hunter.style.setProperty("--hunter-x", `${state.x}px`);
+      hunter.style.setProperty("--hunter-y", `${state.y}px`);
+    }
+
+    function scalePoint(point) {
+      return {
+        x: point.x / 900 * state.width,
+        y: point.y / 640 * state.height
+      };
+    }
+
+    function placeWorldItems() {
+      document.querySelectorAll(".ghost, .picnic, .spray").forEach(node => node.remove());
+      spawnPoints.forEach((point, index) => {
+        if (point.cleared) return;
+        const scaled = scalePoint(point);
+        const node = document.createElement("div");
+        node.className = point.type;
+        node.dataset.index = index;
+        if (point.park) node.dataset.park = point.park;
+        node.style.setProperty("--x", `${scaled.x}px`);
+        node.style.setProperty("--y", `${scaled.y}px`);
+        node.style.setProperty("--tilt", point.tilt);
+        stage.append(node);
+      });
+    }
+
+    function interact() {
+      if (state.done) return;
+      let hit = false;
+      spawnPoints.forEach((point, index) => {
+        if (point.cleared) return;
+        const pos = scalePoint(point);
+        const distance = Math.hypot(state.x - pos.x, state.y - pos.y);
+        if (distance > 74) return;
+        hit = true;
+        if (point.type === "spray") {
+          point.cleared = true;
+          state.sprays += 1;
+          state.items.push("spray can");
+          addLog("Fresh paint loaded. Ghost tags hit harder now.");
+        }
+        if (point.type === "picnic") {
+          state.selectedPark = point.park;
+          addLog(`${parks[point.park].label} crate found. Pick the picky-eater-safe meal.`);
+        }
+        if (point.type === "ghost") {
+          if (state.sprays < 1) {
+            addLog("Need a spray can before tagging that ghost.");
+            return;
+          }
+          if (!state.picnics.has(state.selectedPark)) {
+            addLog(`Pack ${parks[state.selectedPark].label}'s picnic before confronting the ghost.`);
+            return;
+          }
+          point.cleared = true;
+          state.ghosts += 1;
+          addLog(`${parks[state.selectedPark].ghost} gets sealed inside a neon ranger badge.`);
+        }
+      });
+      if (!hit) addLog("Nothing close enough. Move near a ghost, crate, or spray can.");
+      placeWorldItems();
+      updateHud();
+      renderPark();
+      checkWin();
+    }
+
+    function updateSuns(time) {
+      let centerPull = 0;
+      state.suns.forEach(sun => {
+        const node = document.querySelector(`#${sun.id}`);
+        const orbit = document.querySelector(`#${sun.orbit}`);
+        const cx = state.width * sun.cx;
+        const cy = state.height * sun.cy;
+        const rx = state.width * sun.rx;
+        const ry = state.height * sun.ry;
+        const angle = time * sun.speed + sun.phase;
+        const x = cx + Math.cos(angle) * rx;
+        const y = cy + Math.sin(angle * 1.17) * ry;
+        node.style.setProperty("--x", `${x}px`);
+        node.style.setProperty("--y", `${y}px`);
+        orbit.style.left = `${cx}px`;
+        orbit.style.top = `${cy}px`;
+        orbit.style.width = `${rx * 2}px`;
+        orbit.style.height = `${ry * 2}px`;
+        centerPull += Math.hypot(x - cx, y - cy);
+      });
+      const wobble = centerPull / Math.max(state.width, 1);
+      orbitScore.textContent = wobble > .85 ? "Wild" : wobble > .7 ? "Wobble" : "Stable";
+    }
+
+    function tick(time) {
+      if (!state.done) {
+        const speed = state.keys.has("shift") ? 5.2 : 3.6;
+        const dx = (state.keys.has("arrowright") || state.keys.has("d") ? 1 : 0) - (state.keys.has("arrowleft") || state.keys.has("a") ? 1 : 0);
+        const dy = (state.keys.has("arrowdown") || state.keys.has("s") ? 1 : 0) - (state.keys.has("arrowup") || state.keys.has("w") ? 1 : 0);
+        if (dx || dy) {
+          const length = Math.hypot(dx, dy);
+          state.x = clamp(state.x + dx / length * speed, 30, state.width - 30);
+          state.y = clamp(state.y + dy / length * speed, 42, state.height - 42);
+          placeHunter();
+        }
+      }
+      updateSuns(time);
+      requestAnimationFrame(tick);
+    }
+
+    function checkWin() {
+      if (state.ghosts >= 6 && state.picnics.size >= 4) {
+        state.done = true;
+        winScreen.classList.add("show");
+      }
+    }
+
+    function resetGame() {
+      state.selectedPark = "arches";
+      state.x = 52;
+      state.y = 52;
+      state.ghosts = 0;
+      state.picnics = new Set();
+      state.sprays = 0;
+      state.items = [];
+      state.done = false;
+      spawnPoints.forEach(point => delete point.cleared);
+      winScreen.classList.remove("show");
+      log.innerHTML = "";
+      addLog("The wall map wakes up under three unruly suns.");
+      resize();
+      updateHud();
+      renderPark();
+      stage.focus();
+    }
+
+    parkButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        state.selectedPark = button.dataset.park;
+        addLog(`${parks[state.selectedPark].label} route selected.`);
+        renderPark();
+        stage.focus();
+      });
+    });
+
+    window.addEventListener("keydown", event => {
+      const key = event.key.toLowerCase();
+      if (["arrowup", "arrowdown", "arrowleft", "arrowright", "w", "a", "s", "d", " ", "shift"].includes(key)) {
+        event.preventDefault();
+      }
+      if (key === " ") interact();
+      state.keys.add(key);
+    });
+
+    window.addEventListener("keyup", event => {
+      state.keys.delete(event.key.toLowerCase());
+    });
+
+    playAgain.addEventListener("click", resetGame);
+    window.addEventListener("resize", resize);
+
+    resetGame();
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>
