@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GRAFFITI GHOST PICNIC: 3-BODY CHAOS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Rock+Salt&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #111;
+            color: #0f0;
+            font-family: 'Permanent Marker', cursive;
+        }
+
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+            text-shadow: 2px 2px #f0f;
+            z-index: 10;
+        }
+
+        .label {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        #inventory {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .food-item {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #0ff;
+            padding: 10px;
+            border-radius: 5px;
+            color: #0ff;
+        }
+
+        #instructions {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+            color: #ff0;
+            font-size: 14px;
+            text-shadow: 1px 1px #000;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Rock Salt', cursive;
+            font-size: 60px;
+            color: #f0f;
+            margin: 0;
+            filter: drop-shadow(5px 5px #0ff);
+        }
+
+        button {
+            background: #0f0;
+            border: none;
+            padding: 15px 30px;
+            font-size: 24px;
+            font-family: 'Permanent Marker', cursive;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+            background: #ff0;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="overlay">
+        <h1>GRAFFITI GHOST PICNIC</h1>
+        <p style="color: #fff; max-width: 600px;">Tag ghosts with spray paint. Deliver requested snacks to picky eaters. Don't let the 3 Chaotic Suns crush you. GRAFFITI IS NOT A CRIME, GHOSTS ARE.</p>
+        <button onclick="startGame()">START TAGGING</button>
+    </div>
+
+    <div id="ui">
+        <div class="label">SCORE: <span id="score">0</span></div>
+        <div class="label">GHOSTS TAGGED: <span id="ghosts">0</span></div>
+    </div>
+
+    <div id="inventory">
+        <div class="food-item">🍎 APPLE</div>
+        <div class="food-item">🥪 SANDWICH</div>
+        <div class="food-item">🌮 TACO</div>
+    </div>
+
+    <div id="instructions">
+        WASD to Move<br>
+        MOUSE Click to Spray<br>
+        1, 2, 3 to Select Food
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score');
+        const ghostsEl = document.getElementById('ghosts');
+
+        let width, height;
+        let score = 0;
+        let ghostsTagged = 0;
+        let running = false;
+        let selectedFoodIndex = 0;
+
+        const FOOD_TYPES = ["APPLE", "SANDWICH", "TACO"];
+        const FOOD_COLORS = ["#ff4d4d", "#ffd966", "#d9ead3"];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        // --- Game Objects ---
+
+        const player = {
+            x: width / 2,
+            y: height / 2,
+            size: 20,
+            speed: 5,
+            vx: 0,
+            vy: 0
+        };
+
+        const keys = {};
+        window.addEventListener('keydown', e => keys[e.code] = true);
+        window.addEventListener('keyup', e => keys[e.code] = false);
+        window.addEventListener('keydown', e => {
+            if (e.key === '1') selectedFoodIndex = 0;
+            if (e.key === '2') selectedFoodIndex = 1;
+            if (e.key === '3') selectedFoodIndex = 2;
+            updateInventoryUI();
+        });
+
+        function updateInventoryUI() {
+            const items = document.querySelectorAll('.food-item');
+            items.forEach((item, i) => {
+                item.style.borderColor = (i === selectedFoodIndex) ? '#f0f' : '#0ff';
+                item.style.background = (i === selectedFoodIndex) ? 'rgba(255, 0, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)';
+            });
+        }
+        updateInventoryUI();
+
+        let isSpraying = false;
+        let mouseX = 0, mouseY = 0;
+        window.addEventListener('mousedown', () => isSpraying = true);
+        window.addEventListener('mouseup', () => isSpraying = false);
+        window.addEventListener('mousemove', e => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        // --- Physics: Three Body Problem ---
+        // Simplified gravity simulation
+        const bodies = [
+            { x: 200, y: 200, vx: 1, vy: 0, m: 5000, color: '#f00' },
+            { x: 400, y: 300, vx: -1, vy: 1, m: 5000, color: '#ff0' },
+            { x: 300, y: 500, vx: 0, vy: -1, m: 5000, color: '#0ff' }
+        ];
+
+        function updateBodies() {
+            const G = 0.5;
+            for (let i = 0; i < bodies.length; i++) {
+                for (let j = 0; j < bodies.length; j++) {
+                    if (i === j) continue;
+                    const b1 = bodies[i];
+                    const b2 = bodies[j];
+                    const dx = b2.x - b1.x;
+                    const dy = b2.y - b1.y;
+                    const distSq = dx * dx + dy * dy + 1000;
+                    const force = (G * b1.m * b2.m) / distSq;
+                    const ax = force * dx / Math.sqrt(distSq) / b1.m;
+                    const ay = force * dy / Math.sqrt(distSq) / b1.m;
+                    b1.vx += ax;
+                    b1.vy += ay;
+                }
+            }
+            bodies.forEach(b => {
+                b.x += b.vx;
+                b.y += b.vy;
+                // Bounce off walls
+                if (b.x < 0 || b.x > width) b.vx *= -0.8;
+                if (b.y < 0 || b.y > height) b.vy *= -0.8;
+            });
+        }
+
+        // --- Entities ---
+        const ghosts = [];
+        const eaters = [];
+        const particles = [];
+
+        function spawnGhost() {
+            ghosts.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 4,
+                vy: (Math.random() - 0.5) * 4,
+                visible: 0, // 0 to 1, increases when sprayed
+                size: 30,
+                tagged: false
+            });
+        }
+
+        function spawnEater() {
+            eaters.push({
+                x: Math.random() * (width - 100) + 50,
+                y: Math.random() * (height - 100) + 50,
+                request: Math.floor(Math.random() * 3),
+                fed: false,
+                anger: 0
+            });
+        }
+
+        for (let i = 0; i < 8; i++) spawnGhost();
+        for (let i = 0; i < 5; i++) spawnEater();
+
+        function update() {
+            if (!running) return;
+
+            // Player movement
+            if (keys['KeyW']) player.vy -= player.speed;
+            if (keys['KeyS']) player.vy += player.speed;
+            if (keys['KeyA']) player.vx -= player.speed;
+            if (keys['KeyD']) player.vx += player.speed;
+
+            player.x += player.vx;
+            player.y += player.vy;
+            player.vx *= 0.8;
+            player.vy *= 0.8;
+
+            // Constrain player
+            player.x = Math.max(0, Math.min(width, player.x));
+            player.y = Math.max(0, Math.min(height, player.y));
+
+            updateBodies();
+
+            // Spray particles
+            if (isSpraying) {
+                for (let i = 0; i < 5; i++) {
+                    particles.push({
+                        x: player.x,
+                        y: player.y,
+                        vx: (Math.random() - 0.5) * 10 + (mouseX - player.x) * 0.1,
+                        vy: (Math.random() - 0.5) * 10 + (mouseY - player.y) * 0.1,
+                        life: 1.0,
+                        color: `hsl(${Math.random() * 360}, 100%, 50%)`
+                    });
+                }
+            }
+
+            particles.forEach((p, i) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= 0.02;
+                if (p.life <= 0) particles.splice(i, 1);
+            });
+
+            // Ghosts logic
+            ghosts.forEach(g => {
+                g.x += g.vx;
+                g.y += g.vy;
+                if (g.x < 0 || g.x > width) g.vx *= -1;
+                if (g.y < 0 || g.y > height) g.vy *= -1;
+
+                // Spray hitting ghost
+                particles.forEach(p => {
+                    const dx = p.x - g.x;
+                    const dy = p.y - g.y;
+                    if (Math.sqrt(dx*dx + dy*dy) < g.size) {
+                        g.visible = Math.min(1, g.visible + 0.05);
+                        if (g.visible > 0.8 && !g.tagged) {
+                            g.tagged = true;
+                            ghostsTagged++;
+                            score += 100;
+                            ghostsEl.innerText = ghostsTagged;
+                            scoreEl.innerText = score;
+                        }
+                    }
+                });
+                
+                if (g.tagged) {
+                    g.visible -= 0.005;
+                    if (g.visible <= 0) {
+                        g.tagged = false;
+                        g.x = Math.random() * width;
+                        g.y = Math.random() * height;
+                    }
+                }
+            });
+
+            // Eaters logic
+            eaters.forEach(e => {
+                const dx = player.x - e.x;
+                const dy = player.y - e.y;
+                if (Math.sqrt(dx*dx + dy*dy) < 40) {
+                    if (keys['Space'] || isSpraying) { // Simple "action"
+                        if (selectedFoodIndex === e.request && !e.fed) {
+                            e.fed = true;
+                            score += 500;
+                            scoreEl.innerText = score;
+                            setTimeout(() => { e.fed = false; e.request = Math.floor(Math.random()*3); }, 5000);
+                        }
+                    }
+                }
+            });
+
+            // Collision with Bodies (Game Over)
+            bodies.forEach(b => {
+                const dx = player.x - b.x;
+                const dy = player.y - b.y;
+                if (Math.sqrt(dx*dx + dy*dy) < 40) {
+                    gameOver();
+                }
+            });
+        }
+
+        function draw() {
+            ctx.fillStyle = '#111';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw Bodies (The Suns)
+            bodies.forEach(b => {
+                ctx.shadowBlur = 40;
+                ctx.shadowColor = b.color;
+                ctx.fillStyle = b.color;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, 30, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.shadowBlur = 0;
+
+            // Draw Eaters (The National Park Picnickers)
+            eaters.forEach(e => {
+                ctx.fillStyle = e.fed ? '#0f0' : '#fff';
+                ctx.font = '30px "Permanent Marker"';
+                ctx.fillText(e.fed ? '😋' : '😡', e.x - 15, e.y);
+                ctx.font = '14px monospace';
+                ctx.fillStyle = '#fff';
+                ctx.fillText(`WANTS: ${FOOD_TYPES[e.request]}`, e.x - 30, e.y + 20);
+                
+                // Draw a simple "picnic blanket"
+                ctx.strokeStyle = '#fff';
+                ctx.strokeRect(e.x - 25, e.y - 25, 50, 50);
+            });
+
+            // Draw Ghosts
+            ghosts.forEach(g => {
+                ctx.globalAlpha = g.visible;
+                ctx.fillStyle = g.tagged ? '#f0f' : '#fff';
+                ctx.font = '40px "Permanent Marker"';
+                ctx.fillText('👻', g.x - 20, g.y + 10);
+                ctx.globalAlpha = 1.0;
+            });
+
+            // Draw Particles
+            particles.forEach(p => {
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1.0;
+
+            // Draw Player
+            ctx.fillStyle = '#0f0';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#0f0';
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            
+            // Player "Spray Can" line
+            if (isSpraying) {
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(player.x, player.y);
+                ctx.lineTo(mouseX, mouseY);
+                ctx.stroke();
+            }
+
+            requestAnimationFrame(() => {
+                update();
+                draw();
+            });
+        }
+
+        function startGame() {
+            document.getElementById('overlay').style.display = 'none';
+            running = true;
+            score = 0;
+            ghostsTagged = 0;
+            scoreEl.innerText = '0';
+            ghostsEl.innerText = '0';
+            draw();
+        }
+
+        function gameOver() {
+            running = false;
+            document.getElementById('overlay').style.display = 'flex';
+            document.querySelector('#overlay h1').innerText = 'WASTED';
+            document.querySelector('#overlay p').innerText = `The 3-Body Chaos claimed you. Score: ${score}`;
+            document.querySelector('#overlay button').innerText = 'TRY AGAIN';
+        }
+
+    </script>
+</body>
+</html>

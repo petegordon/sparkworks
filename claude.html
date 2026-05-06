@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Improv — Columbus Startup Week</title>
+<meta name="description" content="AI improv: Pete and Dan vibe code an app with prompts from the audience. Columbus Startup Week, 4:00 PM at Meridian.">
+<meta property="og:title" content="AI Improv — Columbus Startup Week">
+<meta property="og:description" content="Pete and Dan vibe code an app with prompts from the audience. 4:00 PM at Meridian.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://sparkworks.jimandi.love/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Bungee+Shade&family=Bungee&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0b0b14;
+    --bg-card: #14142a;
+    --fg: #f5f5fa;
+    --fg-dim: #a0a0c0;
+    --accent: #ff5cf2;
+    --accent-2: #5cf2ff;
+    --ai: #b388ff;
+    --comedy: #5ce0ff;
+    --border: rgba(255, 255, 255, 0.1);
+    /* graffiti palette */
+    --spray-pink: #ff2bd6;
+    --spray-cyan: #2bf6ff;
+    --spray-yellow: #fff23b;
+    --spray-green: #39ff5c;
+    --spray-orange: #ff8a1c;
+    --brick: #1a1226;
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 0%, rgba(255, 92, 242, 0.18), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 100%, rgba(92, 242, 255, 0.15), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+  header { margin-bottom: 48px; }
+  .eyebrow {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-size: clamp(36px, 6vw, 56px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 16px;
+  }
+  .tagline { font-size: 18px; color: var(--fg-dim); max-width: 560px; }
+  .session-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 32px;
+  }
+  .meta-row {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    margin-bottom: 16px; font-size: 14px; color: var(--fg-dim);
+  }
+  .meta-row .time { color: var(--fg); font-weight: 600; }
+  .meta-row .location::before { content: "📍 "; }
+  .session-title {
+    font-size: 24px; font-weight: 700; color: var(--fg);
+    margin-bottom: 8px; letter-spacing: -0.01em;
+  }
+  .speakers { color: var(--fg-dim); font-size: 15px; margin-bottom: 20px; }
+  .duration::before { content: " • "; color: var(--fg-dim); }
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tag {
+    display: inline-block; padding: 4px 12px; border-radius: 999px;
+    font-size: 12px; font-weight: 600; border: 1px solid;
+  }
+  .tag-ai { color: var(--ai); border-color: var(--ai); background: rgba(179, 136, 255, 0.08); }
+  .tag-comedy { color: var(--comedy); border-color: var(--comedy); background: rgba(92, 224, 255, 0.08); }
+  section.about { margin-top: 32px; }
+  section.about h2 { font-size: 20px; font-weight: 700; margin-bottom: 12px; color: var(--fg); }
+  section.about p { color: var(--fg-dim); margin-bottom: 12px; }
+  footer {
+    margin-top: 64px; padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--fg-dim); font-size: 13px; text-align: center;
+  }
+  footer a { color: var(--accent-2); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* ============ GRAFFITI GAME ============ */
+  .game-wall {
+    margin-top: 32px;
+    border-radius: 18px;
+    overflow: hidden;
+    background:
+      repeating-linear-gradient(115deg, rgba(255,255,255,0.02) 0 2px, transparent 2px 14px),
+      radial-gradient(circle at 18% 20%, rgba(255,43,214,0.18), transparent 45%),
+      radial-gradient(circle at 82% 78%, rgba(43,246,255,0.16), transparent 45%),
+      linear-gradient(165deg, #1a0f2e 0%, #0a0612 100%);
+    border: 2px solid rgba(255,255,255,0.08);
+    box-shadow: 0 12px 60px rgba(255, 43, 214, 0.12), inset 0 0 0 1px rgba(255,255,255,0.03);
+  }
+  .tag-banner {
+    position: relative;
+    padding: 22px 24px 18px;
+    border-bottom: 2px dashed rgba(255,255,255,0.08);
+    text-align: center;
+  }
+  .tag-banner h2 {
+    font-family: 'Bungee Shade', 'Permanent Marker', cursive;
+    font-size: clamp(28px, 5.5vw, 44px);
+    line-height: 1;
+    letter-spacing: 0.02em;
+    color: var(--spray-yellow);
+    text-shadow:
+      3px 3px 0 var(--spray-pink),
+      6px 6px 0 rgba(0,0,0,0.6),
+      0 0 22px rgba(255, 43, 214, 0.45);
+    transform: rotate(-2deg);
+    display: inline-block;
+  }
+  .tag-banner .sub {
+    margin-top: 10px;
+    font-family: 'Permanent Marker', cursive;
+    font-size: 14px;
+    color: var(--spray-cyan);
+    letter-spacing: 0.05em;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.7), 0 0 10px rgba(43,246,255,0.4);
+    transform: rotate(1deg);
+  }
+  .drip {
+    position: absolute; left: 50%; top: -2px; width: 4px; height: 18px;
+    background: var(--spray-pink); border-radius: 0 0 4px 4px;
+    box-shadow: 18px 4px 0 -1px var(--spray-cyan), -22px 6px 0 -1px var(--spray-yellow);
+    opacity: 0.7;
+  }
+
+  .hud {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 16px;
+    border-bottom: 2px dashed rgba(255,255,255,0.08);
+  }
+  .hud-cell {
+    background: rgba(0,0,0,0.35);
+    border: 1px dashed rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-family: 'Permanent Marker', cursive;
+    color: var(--fg);
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .hud-cell .label {
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--fg-dim); font-family: 'Inter', sans-serif; font-weight: 600;
+  }
+  .hud-cell .val {
+    font-size: 22px;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.6);
+  }
+  .hud-cell.score .val { color: var(--spray-yellow); }
+  .hud-cell.timer .val { color: var(--spray-cyan); }
+  .hud-cell.fed .val { color: var(--spray-green); }
+  .hud-cell.era .val { font-size: 16px; }
+
+  .suns {
+    display: flex; gap: 14px; padding: 14px 16px;
+    justify-content: center; align-items: center;
+    border-bottom: 2px dashed rgba(255,255,255,0.08);
+    background: rgba(0,0,0,0.18);
+  }
+  .sun {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff7c2, var(--spray-orange) 60%, #5a1a00 100%);
+    box-shadow: 0 0 18px var(--spray-orange), 0 0 4px #fff;
+    transition: transform 0.4s ease, opacity 0.4s ease, filter 0.4s ease;
+  }
+  .sun.dim { filter: grayscale(0.6) brightness(0.4); transform: scale(0.7); opacity: 0.4; }
+  .era-label {
+    font-family: 'Bungee', sans-serif; font-size: 13px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 6px;
+    border: 2px solid; transform: rotate(-1deg);
+  }
+  .era-label.stable { color: var(--spray-green); border-color: var(--spray-green); }
+  .era-label.chaotic {
+    color: var(--spray-pink); border-color: var(--spray-pink);
+    animation: shake 0.4s infinite;
+  }
+  @keyframes shake {
+    0%,100% { transform: rotate(-1deg) translate(0,0); }
+    25% { transform: rotate(2deg) translate(1px,-1px); }
+    50% { transform: rotate(-2deg) translate(-1px,1px); }
+    75% { transform: rotate(1deg) translate(1px,1px); }
+  }
+
+  .arena {
+    position: relative;
+    height: 360px;
+    overflow: hidden;
+    background:
+      repeating-linear-gradient(45deg, rgba(57,255,92,0.04) 0 2px, transparent 2px 16px),
+      radial-gradient(ellipse 70% 60% at 50% 100%, rgba(57,255,92,0.18), transparent 70%),
+      linear-gradient(180deg, #0a0612 0%, #0f0820 60%, #0d1a0c 100%);
+    cursor: crosshair;
+  }
+  .arena.chaotic {
+    animation: chaotic-bg 1.4s infinite;
+  }
+  @keyframes chaotic-bg {
+    0%,100% { filter: hue-rotate(0deg); }
+    50% { filter: hue-rotate(40deg) brightness(1.1); }
+  }
+  .park-tag {
+    position: absolute; bottom: 12px; left: 14px;
+    font-family: 'Bungee', sans-serif;
+    font-size: 12px; letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.18);
+    text-transform: uppercase;
+    transform: rotate(-3deg);
+    pointer-events: none;
+  }
+  .park-tag::before {
+    content: "★"; margin-right: 6px; color: rgba(255,242,59,0.3);
+  }
+
+  .entity {
+    position: absolute;
+    font-size: 38px;
+    cursor: pointer;
+    transition: transform 0.12s;
+    user-select: none;
+    text-shadow: 0 0 12px currentColor, 0 0 2px #000;
+    filter: drop-shadow(2px 3px 0 rgba(0,0,0,0.6));
+  }
+  .entity:hover { transform: scale(1.18) rotate(-4deg); }
+  .entity.ghost { color: rgba(255,255,255,0.7); animation: float 2.5s ease-in-out infinite; }
+  .entity.food { color: var(--spray-yellow); animation: bob 1.6s ease-in-out infinite; }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes bob {
+    0%,100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-4px) rotate(3deg); }
+  }
+  .entity.popping {
+    animation: pop 0.4s forwards;
+    pointer-events: none;
+  }
+  @keyframes pop {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.2) rotate(20deg); opacity: 0; }
+  }
+
+  .splat {
+    position: absolute;
+    pointer-events: none;
+    font-family: 'Bungee Shade', cursive;
+    font-size: 26px;
+    color: var(--spray-pink);
+    text-shadow: 2px 2px 0 #000, 0 0 10px var(--spray-pink);
+    animation: splat-up 0.8s ease-out forwards;
+  }
+  @keyframes splat-up {
+    0% { transform: translateY(0) scale(0.6) rotate(-8deg); opacity: 1; }
+    100% { transform: translateY(-50px) scale(1.4) rotate(8deg); opacity: 0; }
+  }
+
+  .picnic {
+    padding: 16px;
+    background: rgba(0,0,0,0.3);
+    border-top: 2px dashed rgba(255,255,255,0.08);
+  }
+  .picnic h3 {
+    font-family: 'Permanent Marker', cursive;
+    color: var(--spray-cyan);
+    font-size: 18px;
+    margin-bottom: 10px;
+    letter-spacing: 0.04em;
+    transform: rotate(-1deg);
+    text-shadow: 2px 2px 0 #000;
+  }
+  .eaters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  .eater {
+    border: 2px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 10px;
+    background:
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0 4px, transparent 4px 10px),
+      rgba(0,0,0,0.35);
+    position: relative;
+    transition: all 0.3s;
+  }
+  .eater.fed {
+    border-color: var(--spray-green);
+    background: rgba(57,255,92,0.12);
+  }
+  .eater.fed::after {
+    content: "FED!";
+    position: absolute; top: -10px; right: -8px;
+    font-family: 'Bungee Shade', cursive; font-size: 14px;
+    color: var(--spray-green); transform: rotate(8deg);
+    text-shadow: 2px 2px 0 #000;
+  }
+  .eater .name {
+    font-family: 'Permanent Marker', cursive;
+    color: var(--spray-yellow);
+    font-size: 16px;
+    text-shadow: 1px 1px 0 #000;
+  }
+  .eater .wants {
+    font-size: 12px;
+    color: var(--fg-dim);
+    margin-top: 4px;
+  }
+  .eater .wants .emo { font-size: 18px; vertical-align: middle; }
+  .eater .gripe {
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--spray-pink);
+    font-style: italic;
+    line-height: 1.3;
+  }
+
+  .controls {
+    padding: 16px;
+    display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+    border-top: 2px dashed rgba(255,255,255,0.08);
+  }
+  .btn {
+    font-family: 'Bungee', sans-serif;
+    background: var(--spray-pink);
+    color: #0b0b14;
+    border: 3px solid #000;
+    box-shadow: 4px 4px 0 #000, 0 0 18px rgba(255,43,214,0.4);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    text-transform: uppercase;
+    transform: rotate(-1deg);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .btn:hover { transform: rotate(-1deg) translate(-1px,-1px); box-shadow: 5px 5px 0 #000, 0 0 22px rgba(255,43,214,0.6); }
+  .btn:active { transform: rotate(-1deg) translate(2px,2px); box-shadow: 2px 2px 0 #000; }
+  .btn.cyan { background: var(--spray-cyan); }
+  .btn.green { background: var(--spray-green); }
+
+  .gameover {
+    position: absolute; inset: 0;
+    display: none; align-items: center; justify-content: center;
+    flex-direction: column;
+    background: rgba(10, 6, 18, 0.85);
+    backdrop-filter: blur(4px);
+    text-align: center; padding: 24px;
+    z-index: 10;
+  }
+  .gameover.show { display: flex; }
+  .gameover h3 {
+    font-family: 'Bungee Shade', cursive;
+    font-size: 44px;
+    color: var(--spray-yellow);
+    text-shadow: 3px 3px 0 var(--spray-pink), 6px 6px 0 #000;
+    transform: rotate(-3deg);
+    margin-bottom: 10px;
+  }
+  .gameover p {
+    font-family: 'Permanent Marker', cursive;
+    color: var(--spray-cyan);
+    font-size: 18px;
+    margin-bottom: 18px;
+  }
+
+  @media (max-width: 520px) {
+    .hud { grid-template-columns: 1fr; }
+    .arena { height: 300px; }
+    .entity { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <p style="margin-bottom:18px;"><a href="index.html" style="font-family:'Permanent Marker',cursive;color:var(--spray-cyan);text-decoration:none;font-size:14px;letter-spacing:0.05em;">← back to all 3 games</a></p>
+
+  <!-- ====== LIVE APP: TRISOLARIS PARK GHOST PICNIC ====== -->
+  <div class="game-wall" id="game">
+    <div class="tag-banner">
+      <span class="drip"></span>
+      <h2>TRISOLARIS PARK</h2>
+      <div class="sub">// ghost hunt × picky picnic × three-body chaos //</div>
+    </div>
+
+    <div class="suns" id="suns">
+      <div class="sun" data-i="0"></div>
+      <div class="sun" data-i="1"></div>
+      <div class="sun" data-i="2"></div>
+      <span class="era-label stable" id="eraLabel">STABLE ERA</span>
+    </div>
+
+    <div class="hud">
+      <div class="hud-cell score"><span class="label">Score</span><span class="val" id="score">0</span></div>
+      <div class="hud-cell timer"><span class="label">Time</span><span class="val" id="time">90</span></div>
+      <div class="hud-cell fed"><span class="label">Fed</span><span class="val" id="fed">0/4</span></div>
+      <div class="hud-cell era"><span class="label">Suns</span><span class="val" id="sunCount">1☀</span></div>
+    </div>
+
+    <div class="arena" id="arena">
+      <div class="park-tag">RANGER STA. — KEEP IT WEIRD</div>
+      <div class="gameover" id="gameover">
+        <h3 id="goTitle">TIME'S UP!</h3>
+        <p id="goMsg">The trisolarans took the sandwiches.</p>
+        <button class="btn green" id="restart">SPRAY AGAIN</button>
+      </div>
+    </div>
+
+    <div class="picnic">
+      <h3>// the picky crew //</h3>
+      <div class="eaters" id="eaters"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn" id="start">START HUNT</button>
+      <button class="btn cyan" id="howto">HOW 2 PLAY</button>
+    </div>
+  </div>
+</main>
+
+<script>
+(() => {
+  // ---- picky eaters: each wants ONE specific food, refuses the rest ----
+  const FOODS = [
+    { id: 'sand', emo: '🥪', name: 'sandwich' },
+    { id: 'apple', emo: '🍎', name: 'apple' },
+    { id: 'carrot', emo: '🥕', name: 'carrot' },
+    { id: 'dog', emo: '🌭', name: 'hot dog' },
+    { id: 'pretz', emo: '🥨', name: 'pretzel' },
+  ];
+  const CREW = [
+    { name: 'MILO',  wants: 'sand',   gripe: '"crusts off or i riot"' },
+    { name: 'JUNE',  wants: 'apple',  gripe: '"only red ones. NOT green."' },
+    { name: 'OTIS',  wants: 'carrot', gripe: '"raw. no ranch. no peelings."' },
+    { name: 'ZARA',  wants: 'pretz',  gripe: '"soft pretzel or nothing."' },
+  ];
+
+  const arena = document.getElementById('arena');
+  const scoreEl = document.getElementById('score');
+  const timeEl  = document.getElementById('time');
+  const fedEl   = document.getElementById('fed');
+  const sunCountEl = document.getElementById('sunCount');
+  const eraLabel = document.getElementById('eraLabel');
+  const sunsEl  = document.getElementById('suns');
+  const eatersEl = document.getElementById('eaters');
+  const startBtn = document.getElementById('start');
+  const howBtn  = document.getElementById('howto');
+  const restartBtn = document.getElementById('restart');
+  const gameover = document.getElementById('gameover');
+  const goTitle = document.getElementById('goTitle');
+  const goMsg   = document.getElementById('goMsg');
+
+  let state = freshState();
+
+  function freshState() {
+    return {
+      running: false,
+      score: 0,
+      time: 90,
+      fed: new Set(),
+      era: 'stable',  // stable | chaotic
+      suns: 1,
+      tickHandle: null,
+      spawnHandle: null,
+      eraHandle: null,
+      entities: [],
+    };
+  }
+
+  function renderEaters() {
+    eatersEl.innerHTML = '';
+    CREW.forEach(c => {
+      const food = FOODS.find(f => f.id === c.wants);
+      const div = document.createElement('div');
+      div.className = 'eater' + (state.fed.has(c.name) ? ' fed' : '');
+      div.dataset.name = c.name;
+      div.innerHTML = `
+        <div class="name">${c.name}</div>
+        <div class="wants">wants <span class="emo">${food.emo}</span> ${food.name}</div>
+        <div class="gripe">${c.gripe}</div>
+      `;
+      eatersEl.appendChild(div);
+    });
+  }
+
+  function setEra(era) {
+    state.era = era;
+    if (era === 'stable') {
+      state.suns = 1;
+      eraLabel.className = 'era-label stable';
+      eraLabel.textContent = 'STABLE ERA';
+      arena.classList.remove('chaotic');
+      sunsEl.querySelectorAll('.sun').forEach((s,i) => s.classList.toggle('dim', i !== 0));
+    } else {
+      state.suns = 3;
+      eraLabel.className = 'era-label chaotic';
+      eraLabel.textContent = 'CHAOTIC ERA';
+      arena.classList.add('chaotic');
+      sunsEl.querySelectorAll('.sun').forEach(s => s.classList.remove('dim'));
+    }
+    sunCountEl.textContent = state.suns + '☀';
+  }
+
+  function scheduleEraFlip() {
+    // Three-body unpredictability: stable lasts longer, chaotic shorter, both random
+    const dur = state.era === 'stable'
+      ? 6000 + Math.random() * 7000
+      : 3500 + Math.random() * 4000;
+    state.eraHandle = setTimeout(() => {
+      setEra(state.era === 'stable' ? 'chaotic' : 'stable');
+      scheduleEraFlip();
+    }, dur);
+  }
+
+  function spawn() {
+    if (!state.running) return;
+    // chaotic = more ghosts, fewer foods (the trisolarans hide the snacks)
+    const isFood = state.era === 'stable' ? Math.random() < 0.45 : Math.random() < 0.25;
+    const el = document.createElement('div');
+    el.className = 'entity ' + (isFood ? 'food' : 'ghost');
+    if (isFood) {
+      const f = FOODS[Math.floor(Math.random() * FOODS.length)];
+      el.textContent = f.emo;
+      el.dataset.foodId = f.id;
+    } else {
+      el.textContent = '👻';
+    }
+    const w = arena.clientWidth, h = arena.clientHeight;
+    const x = 20 + Math.random() * (w - 60);
+    const y = 20 + Math.random() * (h - 80);
+    el.style.left = x + 'px';
+    el.style.top  = y + 'px';
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      hit(el, x, y);
+    });
+    arena.appendChild(el);
+    state.entities.push(el);
+
+    // entity lifetime — shorter in chaos
+    const life = state.era === 'stable' ? 4500 : 2200;
+    setTimeout(() => {
+      if (el.parentNode && !el.classList.contains('popping')) {
+        el.remove();
+        state.entities = state.entities.filter(e => e !== el);
+      }
+    }, life);
+  }
+
+  function splat(text, x, y, color) {
+    const s = document.createElement('div');
+    s.className = 'splat';
+    s.textContent = text;
+    s.style.left = x + 'px';
+    s.style.top  = y + 'px';
+    if (color) s.style.color = color;
+    arena.appendChild(s);
+    setTimeout(() => s.remove(), 800);
+  }
+
+  function hit(el, x, y) {
+    if (el.classList.contains('popping')) return;
+    el.classList.add('popping');
+    const isFood = el.classList.contains('food');
+    if (isFood) {
+      const fid = el.dataset.foodId;
+      const eater = CREW.find(c => c.wants === fid && !state.fed.has(c.name));
+      if (eater) {
+        state.fed.add(eater.name);
+        state.score += 25;
+        splat('+25 ' + eater.name + '!', x, y, 'var(--spray-green)');
+        renderEaters();
+        if (state.fed.size === CREW.length) {
+          // hunt continues but bonus is locked
+        }
+      } else {
+        // wasted food — picky eaters reject it
+        state.score = Math.max(0, state.score - 5);
+        splat('NOPE! -5', x, y, 'var(--spray-orange)');
+      }
+    } else {
+      // ghost capture
+      const bonus = state.era === 'chaotic' ? 15 : 10;
+      state.score += bonus;
+      splat('+' + bonus + ' BOO!', x, y, 'var(--spray-pink)');
+    }
+    scoreEl.textContent = state.score;
+    setTimeout(() => {
+      el.remove();
+      state.entities = state.entities.filter(e => e !== el);
+    }, 380);
+  }
+
+  function tick() {
+    state.time -= 1;
+    timeEl.textContent = state.time;
+    if (state.time <= 0) end();
+  }
+
+  function start() {
+    if (state.running) return;
+    state = freshState();
+    state.running = true;
+    renderEaters();
+    scoreEl.textContent = '0';
+    timeEl.textContent = state.time;
+    fedEl.textContent = '0/4';
+    setEra('stable');
+    gameover.classList.remove('show');
+    state.tickHandle = setInterval(() => {
+      tick();
+      fedEl.textContent = state.fed.size + '/4';
+    }, 1000);
+    state.spawnHandle = setInterval(spawn, 700);
+    scheduleEraFlip();
+  }
+
+  function end() {
+    state.running = false;
+    clearInterval(state.tickHandle);
+    clearInterval(state.spawnHandle);
+    clearTimeout(state.eraHandle);
+    state.entities.forEach(e => e.remove());
+    state.entities = [];
+    const allFed = state.fed.size === CREW.length;
+    if (allFed && state.score >= 100) {
+      goTitle.textContent = 'PARK CLEARED!';
+      goMsg.textContent = `Crew fed, ghosts spooked. Score: ${state.score}`;
+    } else if (allFed) {
+      goTitle.textContent = 'CREW FED!';
+      goMsg.textContent  = `Picky eaters happy, score: ${state.score}. Hunt more ghosts next time.`;
+    } else {
+      goTitle.textContent = 'PICNIC RUINED!';
+      goMsg.textContent = `Only ${state.fed.size}/4 fed. The trisolarans win. Score: ${state.score}`;
+    }
+    gameover.classList.add('show');
+  }
+
+  startBtn.addEventListener('click', start);
+  restartBtn.addEventListener('click', start);
+  howBtn.addEventListener('click', () => {
+    alert([
+      'TRISOLARIS PARK — RULES',
+      '',
+      '• Click 👻 ghosts to capture them (+10, +15 in chaos).',
+      '• Click food and feed the matching picky eater (+25).',
+      '• Wrong food = picky eater rejects it (-5).',
+      '• 3 suns cycle randomly: STABLE = visible, slow.',
+      '  CHAOTIC = ghosts everywhere, food rare & quick.',
+      '• Win: feed all 4 + score 100+ in 90 seconds.'
+    ].join('\n'));
+  });
+
+  // initial paint
+  renderEaters();
+  setEra('stable');
+})();
+</script>
+</body>
+</html>
